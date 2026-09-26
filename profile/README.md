@@ -1,31 +1,44 @@
 # axonpush
 
-Real-time event infrastructure for AI agent systems.
+See your app, your AI calls, and your errors in one trace.
 
-Agents emit events. Those events land durably, fan out to subscribers in real
-time and to outbound webhooks, and stay searchable and traceable afterwards.
+axonpush brings your OpenTelemetry and Sentry data together with your model and
+tool calls, so a production failure and the AI call behind it sit on the same
+run. Add inline controls at the gateway when you want to block, redact, or cap.
 
-## Sending events
+## Get your traffic in
 
-Point an existing setup at axonpush rather than rewriting your instrumentation.
-Three ingest dialects are supported:
+Three ingest paths. Use any one, or all three on the same trace.
 
-- the native REST API
-- OTLP/HTTP, at `/v1/traces` and `/v1/logs`
-- Sentry SDK envelopes, pointed at an axonpush DSN
+- **Gateway** — point your OpenAI or Anthropic client's base URL at the axonpush
+  gateway and add your key. Every model and tool call is captured, and can be
+  governed inline. No SDK, no code changes beyond the base URL.
+- **OpenTelemetry** — send OTLP from your existing exporter (`/v1/traces`,
+  `/v1/logs`). Your app, database, and queue spans land next to the model calls.
+- **Sentry** — point a Sentry SDK at an axonpush DSN. Exceptions group into
+  issues, with user feedback, on the same trace as the calls that caused them.
 
 ```python
-from axonpush import AxonPush
+# Gateway: one base-URL change
+from openai import OpenAI
 
-with AxonPush() as client:
-    client.events.publish(
-        identifier="research.step",
-        channel_id=CHANNEL_ID,
-        payload={"query": "who cited this paper", "tokens": 412},
-    )
+client = OpenAI(
+    base_url="https://api.axonpush.xyz/gw/openai/v1",
+    default_headers={"x-axonpush-api-key": "ak_..."},
+)
 ```
 
-Subscribe to the same channel over MQTT and the event arrives as it is written.
+## What you get
+
+- **Traces** — model calls, tool calls, and agent handoffs in one run, with a
+  plain-language summary of what happened and where it broke.
+- **Issues** — errors grouped by fingerprint, with triage, on the same trace.
+- **Analytics** — slice usage by model, provider, or your own dimensions
+  (tenant, plan, workflow); drag the latency heatmap to explain a slow cohort.
+- **Controls** — moderation rules, request-governance and spend policies,
+  enforced inline before a call reaches the provider.
+- **Proof** — an immutable, exportable decision trail of every allow, redact,
+  block, and flag.
 
 ## SDKs
 
@@ -36,32 +49,23 @@ Subscribe to the same channel over MQTT and the event arrives as it is written.
 | `AxonPush` | NuGet | `dotnet add package AxonPush` |
 
 All three live in [`sdks`](https://github.com/axonpush/sdks) and generate from
-one OpenAPI contract.
+one OpenAPI contract, with cross-language parity checked in CI.
 
-The generated client is the floor, not the product. On top of it sit resource
-classes, a realtime client, and a shared error tree. Integrations cover
-LangChain, LangGraph, OpenAI Agents, Anthropic, CrewAI, Mastra, LlamaIndex,
-Vercel AI, Semantic Kernel, OpenTelemetry, and the usual logging libraries.
-
-Cross-language drift is checked rather than hoped for. CI compares the resource
-surfaces across languages, so a method that exists in one SDK and not another
-fails the build.
-
-## Wiring it into an existing project
+## Instrument an existing project
 
 ```
 npx @axonpush/wizard
 ```
 
 This installs [`skills`](https://github.com/axonpush/skills) into your coding
-agent. The agent then reads your project, picks the right integration,
-provisions credentials, and writes `.env`. It finishes by publishing a test
-event and reading it back, so you find out immediately if the path is wrong.
-
-Works in Claude Code, Cursor, Codex, and around fifty other agents.
+agent. The agent reads your project, wires the gateway, OpenTelemetry, and
+Sentry so everything correlates on one trace, sets the environment safely, then
+publishes a test event and reads it back, so you find out immediately if the
+path is wrong. Works in Claude Code, Cursor, Codex, and around fifty other
+agents.
 
 ## Links
 
 - [axonpush.xyz](https://axonpush.xyz)
 - [Dashboard](https://app.axonpush.xyz)
-- [Documentation](https://axonpush.xyz/docs)
+- [Documentation](https://docs.axonpush.xyz)
