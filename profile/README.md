@@ -10,12 +10,12 @@ run. Add inline controls at the gateway when you want to block, redact, or cap.
 
 Three ingest paths. Use any one, or all three on the same trace.
 
-- **Gateway** — point your OpenAI or Anthropic client's base URL at the axonpush
+- **Gateway.** Point your OpenAI or Anthropic client's base URL at the axonpush
   gateway and add your key. Every model and tool call is captured, and can be
   governed inline. No SDK, no code changes beyond the base URL.
-- **OpenTelemetry** — send OTLP from your existing exporter (`/v1/traces`,
+- **OpenTelemetry.** Send OTLP from your existing exporter (`/v1/traces`,
   `/v1/logs`). Your app, database, and queue spans land next to the model calls.
-- **Sentry** — point a Sentry SDK at an axonpush DSN. Exceptions group into
+- **Sentry.** Point a Sentry SDK at an axonpush DSN. Exceptions group into
   issues, with user feedback, on the same trace as the calls that caused them.
 
 ```python
@@ -30,14 +30,14 @@ client = OpenAI(
 
 ## What you get
 
-- **Traces** — model calls, tool calls, and agent handoffs in one run, with a
+- **Traces.** Model calls, tool calls, and agent handoffs in one run, with a
   plain-language summary of what happened and where it broke.
-- **Issues** — errors grouped by fingerprint, with triage, on the same trace.
-- **Analytics** — slice usage by model, provider, or your own dimensions
-  (tenant, plan, workflow); drag the latency heatmap to explain a slow cohort.
-- **Controls** — moderation rules, request-governance and spend policies,
-  enforced inline before a call reaches the provider.
-- **Proof** — an immutable, exportable decision trail of every allow, redact,
+- **Issues.** Errors grouped by fingerprint, with triage, on the same trace.
+- **Analytics.** Slice usage by model, provider, or your own dimensions (tenant,
+  plan, workflow), then drag the latency heatmap to explain a slow cohort.
+- **Controls.** Moderation rules, request-governance and spend policies, enforced
+  inline before a call reaches the provider.
+- **Proof.** An immutable, exportable decision trail of every allow, redact,
   block, and flag.
 
 ## SDKs
@@ -53,16 +53,11 @@ one OpenAPI contract, with cross-language parity checked in CI.
 
 ## Instrument an existing project
 
-```
-npx @axonpush/wizard
-```
-
-This installs [`skills`](https://github.com/axonpush/skills) into your coding
-agent. The agent reads your project, wires the gateway, OpenTelemetry, and
-Sentry so everything correlates on one trace, sets the environment safely, then
-publishes a test event and reads it back, so you find out immediately if the
-path is wrong. Works in Claude Code, Cursor, Codex, and around fifty other
-agents.
+Add the axonpush [`skills`](https://github.com/axonpush/skills) to your coding
+agent. The agent reads your project, wires the gateway, OpenTelemetry, and Sentry
+so everything correlates on one trace, sets the environment safely, then
+publishes a test event and reads it back, so you find out immediately if the path
+is wrong. Works in Claude Code, Cursor, Codex, and around fifty other agents.
 
 ## Links
 
